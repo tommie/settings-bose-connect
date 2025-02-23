@@ -18,7 +18,7 @@ jobs:
       run: yarn
 
     - name: Build
-      run: yarn build
+      run: yarn build --base=/settings-bose-connect/
 
     - name: Upload
       uses: actions/upload-pages-artifact@v3
