@@ -48,7 +48,7 @@ export const useDeviceStore = defineStore('device', () => {
       if (import.meta.hot) import.meta.hot.data.boseConnectDevice = newDev
 
       update(newDev).then(() => {
-        scope.run(() => {
+        scope!.run(() => {
           const interval = setInterval(async () => {
             try {
               await update(newDev)
@@ -66,9 +66,12 @@ export const useDeviceStore = defineStore('device', () => {
           newDev.addEventListener('receive', onReceive)
           onScopeDispose(() => newDev.removeEventListener('receive', onReceive))
         })
+      }).finally(() => {
+        opening.value = false
       })
-    } finally {
+    } catch (ex) {
       opening.value = false
+      throw ex
     }
   }
 

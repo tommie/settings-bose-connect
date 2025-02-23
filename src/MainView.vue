@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { ref } from 'vue'
 
-import { Language, NoiseCancellation } from './boseconnect'
+import { Language, NoiseReduction } from './boseconnect'
 import { useDeviceStore } from './stores/device'
 
 import AudioControls from './AudioControls.vue'
@@ -11,34 +11,7 @@ import Header from './Header.vue'
 import NowPlaying from './NowPlaying.vue'
 import PairedDevices from './PairedDevices.vue'
 
-const BOSE_CONNECT_SERVICE_CLASS_ID = '00001101-0000-1000-8000-00805f9b34fb'
-
 const device = useDeviceStore()
-
-async function openAvailablePort() {
-  const ports = (await navigator.serial.getPorts()).filter(
-    (port) =>
-      port.getInfo().bluetoothServiceClassId === BOSE_CONNECT_SERVICE_CLASS_ID && port.connected,
-  )
-
-  if (ports.length !== 1) return
-
-  await device.openPort(ports[0])
-}
-
-async function onConnect() {
-  await openAvailablePort()
-}
-
-onMounted(async () => {
-  navigator.serial.addEventListener('connect', onConnect)
-
-  await openAvailablePort()
-})
-
-onUnmounted(() => {
-  navigator.serial.removeEventListener('connect', onConnect)
-})
 
 const writing = ref(false)
 async function doWriting(fun: () => Promise<void> | void) {
@@ -79,7 +52,7 @@ async function onUpdateAutoOffTimer(value: number) {
   await doWriting(() => device.dev?.setStandbyTimer(value))
 }
 
-async function onUpdateNoiseReduction(value: NoiseCancellation) {
+async function onUpdateNoiseReduction(value: NoiseReduction) {
   await doWriting(() => device.dev?.setNoiseReduction(value))
 }
 
