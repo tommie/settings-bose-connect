@@ -83,12 +83,12 @@ export enum Language {
   PT_BR = 0x07,
   ZH_MA = 0x08, // Mandarin
   KO = 0x09,
-  RU = 0x0A,
-  PL = 0x0B,
-  HE = 0x0C,
-  TR = 0x0D,
-  NL = 0x0E,
-  JA = 0x0F,
+  RU = 0x0a,
+  PL = 0x0b,
+  HE = 0x0c,
+  TR = 0x0d,
+  NL = 0x0e,
+  JA = 0x0f,
   ZH_CA = 0x10, // Cantonese
   AR = 0x11,
   SV = 0x12,
@@ -140,7 +140,7 @@ export enum PlaybackTitleKind {
 export enum VoicePersonalAssistant {
   GOOGLE_ASSISTANT = 0,
   ALEXA = 1,
-  NONE = 0x7F,
+  NONE = 0x7f,
 }
 
 export enum VoicePersonalAssistantTrigger {
@@ -155,21 +155,31 @@ export enum WakeUpWord {
   ALEXA = 1,
 }
 
-export type CustomEventListenerOrEventListenerObject<E extends Event> = {
-  (evt: E): void;
-} | {
-  handleEvent(evt: E): void;
-}
+export type CustomEventListenerOrEventListenerObject<E extends Event> =
+  | {
+      (evt: E): void
+    }
+  | {
+      handleEvent(evt: E): void
+    }
 
 export interface CustomEventTarget<EventMap extends Record<string, Event>> extends EventTarget {
-  addEventListener<K extends keyof EventMap>(type: K, callback: CustomEventListenerOrEventListenerObject<EventMap[K]> | null, options?: AddEventListenerOptions | boolean): void;
-  removeEventListener<K extends keyof EventMap>(type: K, callback: CustomEventListenerOrEventListenerObject<EventMap[K]> | null, options?: EventListenerOptions | boolean): void;
-  dispatchEvent(event: EventMap[keyof EventMap]): boolean;
+  addEventListener<K extends keyof EventMap>(
+    type: K,
+    callback: CustomEventListenerOrEventListenerObject<EventMap[K]> | null,
+    options?: AddEventListenerOptions | boolean,
+  ): void
+  removeEventListener<K extends keyof EventMap>(
+    type: K,
+    callback: CustomEventListenerOrEventListenerObject<EventMap[K]> | null,
+    options?: EventListenerOptions | boolean,
+  ): void
+  dispatchEvent(event: EventMap[keyof EventMap]): boolean
 }
 
 export type BoseConnectEvents = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  receive: CustomEvent<{ id: Function, payload: any }>;
+  receive: CustomEvent<{ id: Function; payload: any }>
 }
 
 export enum Function {
@@ -182,8 +192,8 @@ export enum Function {
   FIRMWARE_VERSION = 0x0005,
   MAC_ADDRESS = 0x0006,
   SERIAL_NUMBER = 0x0007,
-  HARDWARE_REVISION = 0x000A,
-  COMPONENT_DEVICES = 0x000B,
+  HARDWARE_REVISION = 0x000a,
+  COMPONENT_DEVICES = 0x000b,
 
   // Block SETTINGS
   SETTINGS_INFO = 0x0100,
@@ -196,8 +206,8 @@ export enum Function {
   BASS_CONTROL = 0x0107,
   ALERTS = 0x0108,
   BUTTONS = 0x0109,
-  MULTIPOINT = 0x010A,
-  SIDETONE = 0x010B,
+  MULTIPOINT = 0x010a,
+  SIDETONE = 0x010b,
   IMU_VOLUME_CONTROL = 0x0115,
 
   // Block STATUS
@@ -219,9 +229,9 @@ export enum Function {
   CLEAR_DEVICE_LIST = 0x0407,
   PAIRING_MODE = 0x0408,
   LOCAL_MAC_ADDRESS = 0x0409,
-  PREPARE_P2P = 0x040A,
-  P2P_MODE = 0x040B,
-  ROUTING = 0x040C,
+  PREPARE_P2P = 0x040a,
+  P2P_MODE = 0x040b,
+  ROUTING = 0x040c,
 
   // Block AUDIO_MANAGEMENT
   AUDIO_MANAGEMENT_INFO = 0x0500,
@@ -248,7 +258,9 @@ export enum Function {
   // Block 21 AUGMENTED_REALITY
 }
 
-export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarget<BoseConnectEvents> }) {
+export class BoseConnectDevice extends (EventTarget as {
+  new (): CustomEventTarget<BoseConnectEvents>
+}) {
   private readonly low: BoseConnectLowLevel
   private readonly productVersion: Promise<string>
 
@@ -289,16 +301,21 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
     return this.request(Function.GET_ALL_FUNCTION_BLOCKS, undefined, PacketKind.START)
   }
 
-  private parseGetAllFunctionBlocks(data: PacketTree["payload"]) {
+  private parseGetAllFunctionBlocks(data: PacketTree['payload']) {
     if (!(data instanceof Map)) throw new Error()
 
     const dec = new TextDecoder()
 
-    return Array.from(data.values()).map(packet => [packet.cmd >> 8, dec.decode(expectStatus(packet).payload)])
+    return Array.from(data.values()).map((packet) => [
+      packet.cmd >> 8,
+      dec.decode(expectStatus(packet).payload),
+    ])
   }
 
   public async getProductIdVariant() {
-    return this.request(Function.PRODUCT_ID_VARIANT) as Promise<ReturnType<BoseConnectDevice['parseProductIdVariant']>>
+    return this.request(Function.PRODUCT_ID_VARIANT) as Promise<
+      ReturnType<BoseConnectDevice['parseProductIdVariant']>
+    >
   }
 
   private parseProductIdVariant(data: ArrayBuffer) {
@@ -308,7 +325,9 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   public async getFirmwareVersion() {
-    return this.request(Function.FIRMWARE_VERSION) as Promise<ReturnType<BoseConnectDevice['parseFirmwareVersion']>>
+    return this.request(Function.FIRMWARE_VERSION) as Promise<
+      ReturnType<BoseConnectDevice['parseFirmwareVersion']>
+    >
   }
 
   private parseFirmwareVersion(data: ArrayBuffer) {
@@ -316,7 +335,9 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   public getSerialNumber() {
-    return this.request(Function.SERIAL_NUMBER) as Promise<ReturnType<BoseConnectDevice['parseSerialNumber']>>
+    return this.request(Function.SERIAL_NUMBER) as Promise<
+      ReturnType<BoseConnectDevice['parseSerialNumber']>
+    >
   }
 
   private parseSerialNumber(data: ArrayBuffer) {
@@ -324,10 +345,12 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   public getAllSettings() {
-    return this.request(Function.SETTINGS_GET_ALL, undefined, PacketKind.START) as Promise<ReturnType<BoseConnectDevice['parseAllSettings']>>
+    return this.request(Function.SETTINGS_GET_ALL, undefined, PacketKind.START) as Promise<
+      ReturnType<BoseConnectDevice['parseAllSettings']>
+    >
   }
 
-  private parseAllSettings(data: PacketTree["payload"]) {
+  private parseAllSettings(data: PacketTree['payload']) {
     if (!(data instanceof Map)) throw new Error()
 
     const name = data.get(Function.PRODUCT_NAME)
@@ -375,12 +398,12 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   private parseVoicePrompts(data: ArrayBuffer) {
     const view = new Uint8Array(data)
 
-    if (view[1] !== 0x00 || view[2] !== 0x04 || view[3] !== 0xCF || view[4] !== 0xDE) {
+    if (view[1] !== 0x00 || view[2] !== 0x04 || view[3] !== 0xcf || view[4] !== 0xde) {
       console.info(`Unexpected voice prompt settings: ${toHexString(view)}`)
     }
 
     return {
-      language: view[0] & 0x1F,
+      language: view[0] & 0x1f,
       prompt: (view[0] & 0x20) !== 0,
     }
   }
@@ -423,7 +446,9 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   public getSidetone() {
-    return this.request(Function.SIDETONE) as Promise<ReturnType<BoseConnectDevice['parseSidetone']>>
+    return this.request(Function.SIDETONE) as Promise<
+      ReturnType<BoseConnectDevice['parseSidetone']>
+    >
   }
 
   public setSidetone(value: SidetoneMode) {
@@ -435,7 +460,7 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   private parseSidetone(data: ArrayBuffer) {
     const view = new DataView(data)
 
-    if (view.getUint8(0) !== 0x01 || view.getUint8(2) !== 0x0F) {
+    if (view.getUint8(0) !== 0x01 || view.getUint8(2) !== 0x0f) {
       console.info(`Unexpected self voice: ${toHexString(new Uint8Array(data))}`)
     }
 
@@ -445,7 +470,9 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   public getBatteryLevel() {
-    return this.request(Function.BATTERY_LEVEL) as Promise<ReturnType<BoseConnectDevice['parseBatteryLevel']>>
+    return this.request(Function.BATTERY_LEVEL) as Promise<
+      ReturnType<BoseConnectDevice['parseBatteryLevel']>
+    >
   }
 
   private parseBatteryLevel(data: ArrayBuffer) {
@@ -475,7 +502,9 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   public getPairedDeviceList() {
-    return this.request(Function.LIST_DEVICES) as Promise<ReturnType<BoseConnectDevice['parsePairedDeviceList']>>
+    return this.request(Function.LIST_DEVICES) as Promise<
+      ReturnType<BoseConnectDevice['parsePairedDeviceList']>
+    >
   }
 
   private parsePairedDeviceList(data: ArrayBuffer) {
@@ -491,7 +520,9 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
 
   public async getPairedDeviceInfo(addr: Uint8Array | Parameters<(typeof Uint8Array)['from']>) {
     const payload = Uint8Array.from(addr)
-    const out = await this.request(Function.PAIRED_DEVICE_INFO, payload) as ReturnType<BoseConnectDevice["parsePairedDeviceInfo"]>
+    const out = (await this.request(Function.PAIRED_DEVICE_INFO, payload)) as ReturnType<
+      BoseConnectDevice['parsePairedDeviceInfo']
+    >
 
     if (
       out.address.byteLength < payload.byteLength ||
@@ -512,7 +543,9 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
     return {
       address: view.slice(0, 6),
       status,
-      boseProduct: !hasBoseProduct ? undefined : { productId: dview.getUint16(7, false), variant: dview.getUint8(9) },
+      boseProduct: !hasBoseProduct
+        ? undefined
+        : { productId: dview.getUint16(7, false), variant: dview.getUint8(9) },
       name: new TextDecoder().decode(view.slice(hasBoseProduct ? 10 : 9)),
     }
   }
@@ -538,10 +571,12 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   public getAllAudio() {
-    return this.request(Function.AUDIO_GET_ALL, undefined, PacketKind.START) as Promise<ReturnType<BoseConnectDevice['parseAllAudio']>>
+    return this.request(Function.AUDIO_GET_ALL, undefined, PacketKind.START) as Promise<
+      ReturnType<BoseConnectDevice['parseAllAudio']>
+    >
   }
 
-  private parseAllAudio(data: PacketTree["payload"]) {
+  private parseAllAudio(data: PacketTree['payload']) {
     if (!(data instanceof Map)) throw new Error()
 
     const control = data.get(Function.AUDIO_CONTROL)
@@ -579,7 +614,7 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   private parseNowPlaying(data: PacketTree[]) {
-    return data.map(data => {
+    return data.map((data) => {
       const view = new Uint8Array(expectStatus(data).payload)
 
       return {
@@ -600,10 +635,12 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 
   public getAllVpa() {
-    return this.request(Function.VPA_GET_ALL, undefined, PacketKind.START) as Promise<ReturnType<BoseConnectDevice['parseGetAllVpa']>>
+    return this.request(Function.VPA_GET_ALL, undefined, PacketKind.START) as Promise<
+      ReturnType<BoseConnectDevice['parseGetAllVpa']>
+    >
   }
 
-  private parseGetAllVpa(data: PacketTree["payload"]) {
+  private parseGetAllVpa(data: PacketTree['payload']) {
     if (!(data instanceof Map)) throw new Error()
 
     const supported = data.get(Function.SUPPORTED_VPAS)
@@ -615,10 +652,14 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
 
   private parseSupportedVpas(data: ArrayBuffer) {
     // The top bit has some special meaning.
-    return Array.from(new Uint8Array(data)).map(v => (v & 0x7F) as VoicePersonalAssistant)
+    return Array.from(new Uint8Array(data)).map((v) => (v & 0x7f) as VoicePersonalAssistant)
   }
 
-  private async request<C extends Function>(cmd: C, payload?: Parameters<BoseConnectLowLevel['writePacket']>[2], kind = PacketKind.GET) {
+  private async request<C extends Function>(
+    cmd: C,
+    payload?: Parameters<BoseConnectLowLevel['writePacket']>[2],
+    kind = PacketKind.GET,
+  ) {
     await this.productVersion
 
     const resp = await this.low.request(cmd, kind, payload)
@@ -688,7 +729,9 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   }
 }
 
-function isStatus(tree: PacketTree): tree is PacketTree & { kind: PacketKind.STATUS, payload: ArrayBuffer } {
+function isStatus(
+  tree: PacketTree,
+): tree is PacketTree & { kind: PacketKind.STATUS; payload: ArrayBuffer } {
   return tree.kind === PacketKind.STATUS && tree.payload instanceof ArrayBuffer
 }
 
@@ -698,7 +741,9 @@ function expectStatus(tree: PacketTree) {
   return tree
 }
 
-function isProcessing(tree: PacketTree): tree is PacketTree & { kind: PacketKind.PROCESSING, payload: PacketTree[] } {
+function isProcessing(
+  tree: PacketTree,
+): tree is PacketTree & { kind: PacketKind.PROCESSING; payload: PacketTree[] } {
   return tree.kind === PacketKind.PROCESSING && Array.isArray(tree.payload)
 }
 
@@ -708,7 +753,9 @@ function expectProcessing(tree: PacketTree) {
   return tree
 }
 
-function isProcessingMap(tree: PacketTree): tree is PacketTree & { kind: PacketKind.PROCESSING, payload: Map<Function, PacketTree> } {
+function isProcessingMap(
+  tree: PacketTree,
+): tree is PacketTree & { kind: PacketKind.PROCESSING; payload: Map<Function, PacketTree> } {
   return tree.kind === PacketKind.PROCESSING && tree.payload instanceof Map
 }
 

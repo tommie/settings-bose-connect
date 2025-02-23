@@ -35,27 +35,30 @@ export enum ErrorCode {
 }
 
 export interface Packet<Payload = ArrayBuffer> {
-  cmd: number;
-  kind: PacketKind;
-  payload: Payload;
+  cmd: number
+  kind: PacketKind
+  payload: Payload
 }
 
 export type PacketTree = Packet<ArrayBuffer | PacketTree[] | Map<number, PacketTree>>
 
 export class BoseConnectLowLevel {
-  private readonly reader: Pick<ReadableStreamDefaultReader, "cancel">
+  private readonly reader: Pick<ReadableStreamDefaultReader, 'cancel'>
   private readBuf = new Uint8Array(new ArrayBuffer(0, { maxByteLength: 1024 }))
   private abortWrite: (() => Promise<void>) | undefined
   private handleReceive: ((tree: PacketTree) => void) | undefined
 
-  public constructor(private readonly port: SerialPort, private readonly onReceive: (tree: PacketTree) => void) {
+  public constructor(
+    private readonly port: SerialPort,
+    private readonly onReceive: (tree: PacketTree) => void,
+  ) {
     if (!port.readable) throw new DOMException('Port not open', 'InvalidStateError')
 
     const r = port.readable.getReader()
     this.reader = r
     this.runReader(r)
       .finally(() => r.releaseLock())
-      .catch(ex => console.error('Reader terminated:', ex))
+      .catch((ex) => console.error('Reader terminated:', ex))
   }
 
   public async close() {
@@ -76,7 +79,7 @@ export class BoseConnectLowLevel {
       let timeout: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
         timeout = undefined
         abort.abort('Timeout')
-      }, 1000);
+      }, 1000)
 
       try {
         const packet = await this.waitForPacketTree(cmd, abort.signal)
@@ -97,15 +100,11 @@ export class BoseConnectLowLevel {
     }
   }
 
-  private async writePacket(
-    cmd: number,
-    kind: PacketKind,
-    payload?: Uint8Array | number[],
-  ) {
+  private async writePacket(cmd: number, kind: PacketKind, payload?: Uint8Array | number[]) {
     const payloadLength = Array.isArray(payload) ? payload.length : payload ? payload.byteLength : 0
     const data = new Uint8Array(4 + payloadLength)
-    data[0] = (cmd >> 8) & 0xFF
-    data[1] = cmd & 0xFF
+    data[0] = (cmd >> 8) & 0xff
+    data[1] = cmd & 0xff
     data[2] = kind
     data[3] = payloadLength
     if (payload) data.set(payload, 4)
@@ -127,7 +126,7 @@ export class BoseConnectLowLevel {
 
   private async waitForPacketTree(cmd: number, abort?: AbortSignal) {
     return new Promise<PacketTree | null>((resolve) => {
-      if (this.handleReceive) throw new Error("Only one reader at a time is supported")
+      if (this.handleReceive) throw new Error('Only one reader at a time is supported')
 
       const end = (packet: PacketTree | null) => {
         abort?.removeEventListener('abort', onAbort)
@@ -149,7 +148,7 @@ export class BoseConnectLowLevel {
   }
 
   private async runReader(r: ReadableStreamDefaultReader) {
-    for (; ;) {
+    for (;;) {
       try {
         const packet = await this.readPacketTree(r)
         if (!packet) break
@@ -174,7 +173,10 @@ export class BoseConnectLowLevel {
     return this.readPacketTreeRec(packet, r)
   }
 
-  private async readPacketTreeRec(packet: Packet, r: ReadableStreamDefaultReader): Promise<PacketTree | null> {
+  private async readPacketTreeRec(
+    packet: Packet,
+    r: ReadableStreamDefaultReader,
+  ): Promise<PacketTree | null> {
     switch (packet.kind) {
       case PacketKind.STATUS:
         return packet
@@ -182,7 +184,9 @@ export class BoseConnectLowLevel {
       case PacketKind.ERROR: {
         const payload = new Uint8Array(packet.payload)
         const name = payload.length === 1 ? ErrorCode[payload[0]] : undefined
-        throw new PacketError(`Error received for 0x${packet.cmd.toString(0x10)}: ${name ?? toHexString(payload)}`)
+        throw new PacketError(
+          `Error received for 0x${packet.cmd.toString(0x10)}: ${name ?? toHexString(payload)}`,
+        )
       }
 
       case PacketKind.PROCESSING:
@@ -192,11 +196,13 @@ export class BoseConnectLowLevel {
         return { ...packet, payload: [] }
 
       default:
-        throw new PacketError(`Received unexpected kind for 0x${packet.cmd.toString(0x10)}: ${packet.kind}`)
+        throw new PacketError(
+          `Received unexpected kind for 0x${packet.cmd.toString(0x10)}: ${packet.kind}`,
+        )
     }
 
     let tree: PacketTree | undefined
-    for (; ;) {
+    for (;;) {
       const pkt = await this.readPacket(r)
       if (!pkt) return null
 
@@ -205,21 +211,23 @@ export class BoseConnectLowLevel {
 
         switch (pkt.kind) {
           case PacketKind.STATUS:
-            (tree.payload as PacketTree[]).push(pkt)
+            ;(tree.payload as PacketTree[]).push(pkt)
             break
 
           case PacketKind.RESULT:
             return tree
 
           default:
-            throw new PacketError(`Received unexpected kind for 0x${packet.cmd.toString(0x10)}: ${packet.kind}`)
+            throw new PacketError(
+              `Received unexpected kind for 0x${packet.cmd.toString(0x10)}: ${packet.kind}`,
+            )
         }
       } else {
-        if (!tree) tree = { ...packet, payload: new Map() };
+        if (!tree) tree = { ...packet, payload: new Map() }
         const pktTree = await this.readPacketTreeRec(pkt, r)
-        if (!pktTree) return null;
+        if (!pktTree) return null
 
-        (tree.payload as Map<number, PacketTree>).set(pkt.cmd, pktTree)
+        ;(tree.payload as Map<number, PacketTree>).set(pkt.cmd, pktTree)
       }
     }
   }

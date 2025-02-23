@@ -2,17 +2,17 @@
 import { NoiseReduction, Language } from './boseconnect'
 
 const props = defineProps<{
-  voicePrompts: boolean;
-  language: Language;
-  autoOffTimer: number; // In minutes.
-  noiseReduction: NoiseReduction;
+  voicePrompts: boolean
+  language: Language
+  autoOffTimer: number // In minutes.
+  noiseReduction: NoiseReduction
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:voicePrompts', value: boolean): void;
-  (e: 'update:language', value: Language): void;
-  (e: 'update:autoOffTimer', value: number): void;
-  (e: 'update:noiseReduction', value: NoiseReduction): void;
+  (e: 'update:voicePrompts', value: boolean): void
+  (e: 'update:language', value: Language): void
+  (e: 'update:autoOffTimer', value: number): void
+  (e: 'update:noiseReduction', value: NoiseReduction): void
 }>()
 
 function onChangeVoicePrompts(e: Event) {
@@ -20,7 +20,10 @@ function onChangeVoicePrompts(e: Event) {
 }
 
 function onChangeLanguage(e: Event) {
-  emit('update:language', Reflect.get(Language, (e.target as HTMLSelectElement).value) ?? props.language)
+  emit(
+    'update:language',
+    Reflect.get(Language, (e.target as HTMLSelectElement).value) ?? props.language,
+  )
 }
 
 function onChangeAutoOffTimer(e: Event) {
@@ -28,7 +31,10 @@ function onChangeAutoOffTimer(e: Event) {
 }
 
 function onChangeNoiseReduction(e: Event) {
-  emit('update:noiseReduction', Reflect.get(NoiseReduction, (e.target as HTMLSelectElement).value) ?? props.noiseReduction)
+  emit(
+    'update:noiseReduction',
+    Reflect.get(NoiseReduction, (e.target as HTMLSelectElement).value) ?? props.noiseReduction,
+  )
 }
 </script>
 
@@ -42,7 +48,12 @@ function onChangeNoiseReduction(e: Event) {
             <span>Voice Prompts</span>
           </div>
           <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" :checked="voicePrompts" @change="onChangeVoicePrompts">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              :checked="voicePrompts"
+              @change="onChangeVoicePrompts"
+            />
           </div>
         </div>
 
@@ -51,8 +62,12 @@ function onChangeNoiseReduction(e: Event) {
             <i class="bi bi-globe"></i>
             <span>Language</span>
           </div>
-          <select class="form-select form-select-sm bg-dark text-white border-secondary" style="width: 100px"
-            :value="Language[language]" @change="onChangeLanguage">
+          <select
+            class="form-select form-select-sm bg-dark text-white border-secondary"
+            style="width: 100px"
+            :value="Language[language]"
+            @change="onChangeLanguage"
+          >
             <option :value="Language[Language.AR]">Arabic</option>
             <option :value="Language[Language.ZH_CA]">Chinese (Cantonese)</option>
             <option :value="Language[Language.ZH_MA]">Chinese (Mandarin)</option>
@@ -83,8 +98,12 @@ function onChangeNoiseReduction(e: Event) {
             <i class="bi bi-clock"></i>
             <span>Auto-off</span>
           </div>
-          <select class="form-select form-select-sm bg-dark text-white border-secondary" style="width: 100px"
-            :value="autoOffTimer" @change="onChangeAutoOffTimer">
+          <select
+            class="form-select form-select-sm bg-dark text-white border-secondary"
+            style="width: 100px"
+            :value="autoOffTimer"
+            @change="onChangeAutoOffTimer"
+          >
             <option value="0">Off</option>
             <option value="5">5 min</option>
             <option value="20">20 min</option>
@@ -99,8 +118,12 @@ function onChangeNoiseReduction(e: Event) {
             <i class="bi bi-shield"></i>
             <span>Noise Reduction</span>
           </div>
-          <select class="form-select form-select-sm bg-dark text-white border-secondary" style="width: 100px"
-            :value="NoiseReduction[noiseReduction]" @change="onChangeNoiseReduction">
+          <select
+            class="form-select form-select-sm bg-dark text-white border-secondary"
+            style="width: 100px"
+            :value="NoiseReduction[noiseReduction]"
+            @change="onChangeNoiseReduction"
+          >
             <option :value="NoiseReduction[NoiseReduction.OFF]">Off</option>
             <option :value="NoiseReduction[NoiseReduction.LOW]">Low</option>
             <!-- TODO: not supported by 0x4020 <option :value="NoiseReduction[NoiseReduction.WIND]">Wind</option>-->

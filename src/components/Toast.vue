@@ -3,22 +3,25 @@
 import { Toast } from 'bootstrap'
 import { onMounted, shallowRef, watch } from 'vue'
 
-const props = withDefaults(defineProps<{
-  show: boolean;
+const props = withDefaults(
+  defineProps<{
+    show: boolean
 
-  animation?: boolean;
-  autohide?: boolean;
-  delay?: number;
-}>(), {
-  // Bootstrap defaults, but they all have to be passed if options is provided.
-  animation: true,
-  autohide: true,
-  delay: 5000,
-})
+    animation?: boolean
+    autohide?: boolean
+    delay?: number
+  }>(),
+  {
+    // Bootstrap defaults, but they all have to be passed if options is provided.
+    animation: true,
+    autohide: true,
+    delay: 5000,
+  },
+)
 
 const emit = defineEmits<{
-  (e: 'showtoast'): void;
-  (e: 'hidetoast'): void;
+  (e: 'showtoast'): void
+  (e: 'hidetoast'): void
 }>()
 
 function onShow() {
@@ -32,13 +35,13 @@ function onHide() {
 const toastRef = shallowRef<HTMLDivElement>()
 watch(toastRef, (toastRef, prevToastRef) => {
   if (prevToastRef) {
-    prevToastRef.removeEventListener("show.bs.toast", onShow)
-    prevToastRef.removeEventListener("hide.bs.toast", onHide)
+    prevToastRef.removeEventListener('show.bs.toast', onShow)
+    prevToastRef.removeEventListener('hide.bs.toast', onHide)
   }
 
   if (toastRef) {
-    toastRef.addEventListener("show.bs.toast", onShow)
-    toastRef.addEventListener("hide.bs.toast", onHide)
+    toastRef.addEventListener('show.bs.toast', onShow)
+    toastRef.addEventListener('hide.bs.toast', onHide)
   }
 })
 
@@ -55,10 +58,13 @@ onMounted(() => {
   if (props.show) toast.value.show()
 })
 
-watch(() => props.show, (show) => {
-  if (show) toast.value?.show()
-  else toast.value?.hide()
-})
+watch(
+  () => props.show,
+  (show) => {
+    if (show) toast.value?.show()
+    else toast.value?.hide()
+  },
+)
 
 defineExpose({
   isShown() {

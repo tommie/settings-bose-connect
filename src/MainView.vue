@@ -83,26 +83,59 @@ function getSource() {
 
 <template>
   <div class="p-3">
-    <Header :deviceName="device.deviceSettings.name.name" :batteryLevel="device.batteryLevel"
-      @update:deviceName="onUpdateDeviceName" v-if="device.deviceSettings?.name && device.batteryLevel !== undefined" />
-    <NowPlaying :status="device.audioStatus.playback" :data="device.audioStatus.title ?? []" :source="getSource()"
-      v-if="device.audioStatus?.playback !== undefined && device.activeDevice !== undefined" />
-    <AudioControls :maxVolume="device.audioStatus.volume.max" :volume="device.audioStatus.volume.current"
+    <Header
+      :deviceName="device.deviceSettings.name.name"
+      :batteryLevel="device.batteryLevel"
+      @update:deviceName="onUpdateDeviceName"
+      v-if="device.deviceSettings?.name && device.batteryLevel !== undefined"
+    />
+    <NowPlaying
+      :status="device.audioStatus.playback"
+      :data="device.audioStatus.title ?? []"
+      :source="getSource()"
+      v-if="device.audioStatus?.playback !== undefined && device.activeDevice !== undefined"
+    />
+    <AudioControls
+      :maxVolume="device.audioStatus.volume.max"
+      :volume="device.audioStatus.volume.current"
       @update:volume="onUpdateVolume"
-      v-if="device.audioStatus?.volume?.current !== undefined && device.audioStatus?.volume?.max !== undefined" />
-    <DeviceSettings :voicePrompts="device.deviceSettings.language.prompt"
-      :language="device.deviceSettings.language.language" :autoOffTimer="device.deviceSettings.autoOff"
-      :noiseReduction="device.deviceSettings.anc" @update:voicePrompts="onUpdateVoicePrompts"
-      @update:language="onUpdateLanguage" @update:autoOffTimer="onUpdateAutoOffTimer"
+      v-if="
+        device.audioStatus?.volume?.current !== undefined &&
+        device.audioStatus?.volume?.max !== undefined
+      "
+    />
+    <DeviceSettings
+      :voicePrompts="device.deviceSettings.language.prompt"
+      :language="device.deviceSettings.language.language"
+      :autoOffTimer="device.deviceSettings.autoOff"
+      :noiseReduction="device.deviceSettings.anc"
+      @update:voicePrompts="onUpdateVoicePrompts"
+      @update:language="onUpdateLanguage"
+      @update:autoOffTimer="onUpdateAutoOffTimer"
       @update:noiseReduction="onUpdateNoiseReduction"
-      v-if="device.deviceSettings?.language && device.deviceSettings?.autoOff !== undefined && device.deviceSettings.anc !== undefined" />
-    <PairedDevices :devices="device.pairedDevices" @pairing="onPairing" @disconnect="onDisconnectDevice"
-      @remove="onRemoveDevice" v-if="device.pairedDevices" />
-    <DeviceInfo :serialNumber="device.serialNumber" :deviceId="device.productId.productId"
-      :deviceVersion="device.productVersion" :firmwareVersion="device.firmwareVersion"
-      v-if="device.serialNumber && device.productId && device.productVersion && device.firmwareVersion" />
+      v-if="
+        device.deviceSettings?.language &&
+        device.deviceSettings?.autoOff !== undefined &&
+        device.deviceSettings.anc !== undefined
+      "
+    />
+    <PairedDevices
+      :devices="device.pairedDevices"
+      @pairing="onPairing"
+      @disconnect="onDisconnectDevice"
+      @remove="onRemoveDevice"
+      v-if="device.pairedDevices"
+    />
+    <DeviceInfo
+      :serialNumber="device.serialNumber"
+      :deviceId="device.productId.productId"
+      :deviceVersion="device.productVersion"
+      :firmwareVersion="device.firmwareVersion"
+      v-if="
+        device.serialNumber && device.productId && device.productVersion && device.firmwareVersion
+      "
+    />
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

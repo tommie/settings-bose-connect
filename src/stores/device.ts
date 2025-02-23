@@ -33,7 +33,7 @@ export const useDeviceStore = defineStore('device', () => {
     if (import.meta.hot) {
       if (import.meta.hot.data.boseConnectDevice) {
         // Add a delay to let the old version close.
-        await new Promise(done => setTimeout(done, 10))
+        await new Promise((done) => setTimeout(done, 10))
       }
     }
 
@@ -90,7 +90,7 @@ export const useDeviceStore = defineStore('device', () => {
       batteryLevel.value = await dev.getBatteryLevel()
 
       const newPairedDevices: Awaited<ReturnType<BoseConnectDevice['getPairedDeviceInfo']>>[] = []
-      for (const address of (await dev.getPairedDeviceList())) {
+      for (const address of await dev.getPairedDeviceList()) {
         newPairedDevices.push(await dev.getPairedDeviceInfo(address))
       }
       pairedDevices.value = newPairedDevices
@@ -134,13 +134,16 @@ export const useDeviceStore = defineStore('device', () => {
         activeDevice.value = e.detail.payload
         updating.value = true
         audioStatus.value = undefined
-        dev.value.getAllAudio().then(status => {
-          if (!audioStatus.value) {
-            audioStatus.value = status
-          }
-        }).finally(() => {
-          updating.value = false
-        })
+        dev.value
+          .getAllAudio()
+          .then((status) => {
+            if (!audioStatus.value) {
+              audioStatus.value = status
+            }
+          })
+          .finally(() => {
+            updating.value = false
+          })
         break
 
       case Function.PLAYBACK_STATUS:

@@ -71,8 +71,7 @@ async function onClickDisconnect() {
   <div class="min-vh-100">
     <div class="d-flex min-vh-100 align-items-center justify-content-center" v-if="device.opening">
       <div class="text-center my-5">
-        <div class="spinner-border text-primary" role="status">
-        </div>
+        <div class="spinner-border text-primary" role="status"></div>
         <div class="mt-3">Opening&hellip;</div>
       </div>
     </div>
@@ -87,7 +86,9 @@ async function onClickDisconnect() {
         <div class="toast-header">
           <i class="bi bi-exclamation-circle-fill text-danger me-3" />
           <strong class="me-auto text-danger">Failed to connect</strong>
-          <button class="btn btn-sm btn-link btn-secondary" @click="errorShown = false"><i class="bi bi-x" /></button>
+          <button class="btn btn-sm btn-link btn-secondary" @click="errorShown = false">
+            <i class="bi bi-x" />
+          </button>
         </div>
 
         <div class="toast-body">
