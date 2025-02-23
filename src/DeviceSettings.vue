@@ -55,24 +55,35 @@ function onChangeNoiseCancellation(e: Event) {
           </div>
           <select class="form-select form-select-sm bg-dark text-white border-secondary" style="width: 100px"
             :value="Language[language]" @change="onChangeLanguage">
-            <option :value="Language[Language.EN]">English</option>
-            <option :value="Language[Language.FR]">French</option>
-            <option :value="Language[Language.IT]">Italian</option>
-            <option :value="Language[Language.DE]">German</option>
-            <option :value="Language[Language.ES]">Spanish</option>
-            <option :value="Language[Language.PT]">Portuguese</option>
-            <option :value="Language[Language.ZH]">Chinese</option>
-            <option :value="Language[Language.KO]">Korean</option>
+            <option :value="Language[Language.AR]">Arabic</option>
+            <option :value="Language[Language.ZH_CA]">Chinese (Cantonese)</option>
+            <option :value="Language[Language.ZH_MA]">Chinese (Mandarin)</option>
+            <option :value="Language[Language.DA]">Danish</option>
             <option :value="Language[Language.NL]">Dutch</option>
+            <option :value="Language[Language.EN_UK]">English (UK)</option>
+            <option :value="Language[Language.EN_US]">English (US)</option>
+            <option :value="Language[Language.FI]">Finnish</option>
+            <option :value="Language[Language.FR]">French</option>
+            <option :value="Language[Language.DE]">German</option>
+            <option :value="Language[Language.HE]">Hebrew</option>
+            <option :value="Language[Language.IT]">Italian</option>
             <option :value="Language[Language.JA]">Japanese</option>
+            <option :value="Language[Language.KO]">Korean</option>
+            <option :value="Language[Language.NO]">Norwegian</option>
+            <option :value="Language[Language.PL]">Polish</option>
+            <option :value="Language[Language.PT_BR]">Portuguese (Brasil)</option>
+            <option :value="Language[Language.RU]">Russian</option>
+            <option :value="Language[Language.ES_ES]">Spanish (Spain)</option>
+            <option :value="Language[Language.ES_MX]">Spanish (Mexico)</option>
             <option :value="Language[Language.SV]">Swedish</option>
+            <option :value="Language[Language.TR]">Turkish</option>
           </select>
         </div>
 
         <div class="d-flex align-items-center gap-3">
           <div class="d-flex align-items-center gap-3 flex-grow-1">
             <i class="bi bi-clock"></i>
-            <span>Auto-off Timer</span>
+            <span>Auto-off</span>
           </div>
           <select class="form-select form-select-sm bg-dark text-white border-secondary" style="width: 100px"
             :value="autoOffTimer" @change="onChangeAutoOffTimer">
@@ -88,7 +99,7 @@ function onChangeNoiseCancellation(e: Event) {
         <div class="d-flex align-items-center gap-3">
           <div class="d-flex align-items-center gap-3 flex-grow-1">
             <i class="bi bi-shield"></i>
-            <span>Noise Cancellation</span>
+            <span>Noise Reduction</span>
           </div>
           <select class="form-select form-select-sm bg-dark text-white border-secondary" style="width: 100px"
             :value="NoiseReduction[noiseLevel]" @change="onChangeNoiseCancellation">
