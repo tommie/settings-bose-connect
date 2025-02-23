@@ -2,11 +2,14 @@
 import { getCurrentScope, onMounted, onScopeDispose, onUnmounted, ref, shallowRef } from 'vue'
 
 import { useDeviceStore } from './stores/device'
+import Toast from './components/Toast.vue'
 import MainView from './MainView.vue'
 
 const BOSE_CONNECT_SERVICE_CLASS_ID = '00001101-0000-1000-8000-00805f9b34fb'
 
 const device = useDeviceStore()
+const error = ref('')
+const errorShown = ref(false)
 
 async function openAvailablePort() {
   const ports = (await navigator.serial.getPorts()).filter(
@@ -16,7 +19,14 @@ async function openAvailablePort() {
 
   if (ports.length !== 1) return
 
-  await device.openPort(ports[0])
+  try {
+    errorShown.value = false
+    await device.openPort(ports[0])
+  } catch (ex) {
+    console.error(ex)
+    error.value = String(ex)
+    errorShown.value = true
+  }
 }
 
 async function onConnect() {
@@ -71,5 +81,19 @@ async function onClickDisconnect() {
       <button class="btn btn-primary" @click="onClickOpen">Open device&hellip;</button>
     </div>
     <!--<button class="btn btn-secondary" @click="onClickDisconnect">Disconnect</button>-->
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <Toast :show="errorShown" @hidetoast="errorShown = false">
+        <div class="toast-header">
+          <i class="bi bi-exclamation-circle-fill text-danger me-3" />
+          <strong class="me-auto text-danger">Failed to connect</strong>
+          <button class="btn btn-sm btn-link btn-secondary" @click="errorShown = false"><i class="bi bi-x" /></button>
+        </div>
+
+        <div class="toast-body">
+          {{ error }}
+        </div>
+      </Toast>
+    </div>
   </div>
 </template>
