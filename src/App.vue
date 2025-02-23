@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getCurrentScope, onMounted, onScopeDispose, onUnmounted, ref, shallowRef } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 import { useDeviceStore } from './stores/device'
 import Toast from './components/Toast.vue'
