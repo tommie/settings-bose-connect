@@ -22,7 +22,7 @@ function onChangeVoicePrompts(e: Event) {
 }
 
 function onChangeLanguage(e: Event) {
-  emit('update:language', Language[(e.target as HTMLSelectElement).value] ?? props.language)
+  emit('update:language', Reflect.get(Language, (e.target as HTMLSelectElement).value) ?? props.language)
 }
 
 function onChangeAutoOffTimer(e: Event) {
@@ -30,7 +30,7 @@ function onChangeAutoOffTimer(e: Event) {
 }
 
 function onChangeNoiseReduction(e: Event) {
-  emit('update:noiseReduction', NoiseReduction[(e.target as HTMLSelectElement).value] ?? props.noiseReduction)
+  emit('update:noiseReduction', Reflect.get(NoiseReduction, (e.target as HTMLSelectElement).value) ?? props.noiseReduction)
 }
 </script>
 

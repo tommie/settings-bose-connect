@@ -425,7 +425,7 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
     return this.request(Function.SIDETONE) as Promise<ReturnType<BoseConnectDevice['parseSidetone']>>
   }
 
-  public setSidetone(value: Sidetone) {
+  public setSidetone(value: SidetoneMode) {
     const payload = new Uint8Array([0x01, value, 0x38])
 
     return this.request(Function.SIDETONE, payload, PacketKind.SET_GET)
@@ -457,32 +457,20 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   public async connectDevice(addr: Uint8Array | Parameters<(typeof Uint8Array)['from']>) {
     const payload = new Uint8Array(1 + 6)
     payload.set(addr, 1)
-    const resp = await this.request(Function.CONNECT, payload, PacketKind.START) as PacketTree[]
-
-    this.checkDeviceAddress(payload.slice(1), resp)
+    const resp = await this.request(Function.CONNECT, payload, PacketKind.START)
+    if (DEBUG) console.log(resp)
   }
 
   public async disconnectDevice(addr: Uint8Array | Parameters<(typeof Uint8Array)['from']>) {
     const payload = Uint8Array.from(addr)
-    const resp = await this.request(Function.DISCONNECT, payload, PacketKind.START) as PacketTree[]
-
-    this.checkDeviceAddress(payload, resp)
+    const resp = await this.request(Function.DISCONNECT, payload, PacketKind.START)
+    if (DEBUG) console.log(resp)
   }
 
   public async removeDevice(addr: Uint8Array | Parameters<(typeof Uint8Array)['from']>) {
     const payload = Uint8Array.from(addr)
-    const resp = await this.request(Function.REMOVE_DEVICE, payload, PacketKind.START) as PacketTree[]
-
-    this.checkDeviceAddress(payload, resp)
-  }
-
-  private checkDeviceAddress(addr: Uint8Array, data: PacketTree[]) {
-    if (
-      data.byteLength !== addr.byteLength ||
-      !new Uint8Array(resp).every((v, i) => v === addr[i])
-    ) {
-      throw new Error()
-    }
+    const resp = await this.request(Function.REMOVE_DEVICE, payload, PacketKind.START)
+    if (DEBUG) console.log(resp)
   }
 
   public getPairedDeviceList() {
@@ -594,7 +582,7 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
       const view = new Uint8Array(expectStatus(data).payload)
 
       return {
-        kind: view[0],
+        kind: view[0] as PlaybackTitleKind,
         text: new TextDecoder().decode(view.slice(1)),
       }
     })

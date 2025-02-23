@@ -85,7 +85,7 @@ function getSource() {
   <div class="p-3">
     <Header :deviceName="device.deviceSettings.name.name" :batteryLevel="device.batteryLevel"
       @update:deviceName="onUpdateDeviceName" v-if="device.deviceSettings?.name && device.batteryLevel !== undefined" />
-    <NowPlaying :status="device.audioStatus.playback" :data="device.audioStatus.title" :source="getSource()"
+    <NowPlaying :status="device.audioStatus.playback" :data="device.audioStatus.title ?? []" :source="getSource()"
       v-if="device.audioStatus?.playback !== undefined && device.activeDevice !== undefined" />
     <AudioControls :maxVolume="device.audioStatus.volume.max" :volume="device.audioStatus.volume.current"
       @update:volume="onUpdateVolume"
