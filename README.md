@@ -25,3 +25,10 @@ yarn build
 ```sh
 yarn lint
 ```
+
+## Appreciations
+
+- https://github.com/Denton-L/based-connect
+  - https://github.com/bosefirmware/BoseConnect-Linux_based-connect/
+- https://github.com/bosefirmware/OpenBose-Connect/
+- https://github.com/bosefirmware/BoseConnect-Android_Basic-control/
