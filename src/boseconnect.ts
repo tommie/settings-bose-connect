@@ -2,6 +2,51 @@ import { BoseConnectLowLevel, PacketKind, type PacketTree, toHexString } from '.
 
 const DEBUG = false
 
+export enum ProductId {
+  BRUSSELS = 0x23,
+  EDELMAN = 0x94f,
+
+  ISAAC = 0x400a,
+  WOLFCASTLE = 0x400c,
+  FOREMAN = 0x400d,
+  FOLGERS = 0x4010,
+  HARVEY = 0x4011,
+  ICE = 0x4012,
+  FLURRY = 0x4013,
+  STETSON = 0x4015,
+  POWDER = 0x4014,
+  KLEOS = 0x4017,
+  LEVI = 0x4018,
+  LEVI_SLAVE = 0x4019,
+  LEVI_CASE = 0x401a,
+  BAYWOLF = 0x4020,
+  ATLAS = 0x4021,
+  MINNOW = 0x4022,
+  GOODYEAR = 0x4024,
+  BEANIE = 0x402b,
+  CELINE = 0x402c,
+  REVEL = 0x402d,
+  LANDO = 0x402f,
+  BUDLITE = 0x4034,
+  DURAN = 0x4039,
+  GWEN = 0x403a,
+  CELINE_II = 0x404c,
+  OLIVIA = 0x4060,
+  VEDDER = 0x4061,
+  SMALLS = 0x4064,
+  SMALLS_CASE = 0x4065,
+  LONESTARR = 0x4066,
+  SERENA_CASE = 0x4067,
+  SERENA = 0x4068,
+  SCOTTY = 0x4072,
+  SCOTTY_CHARGING_CASE = 0x4073,
+  PRINCE = 0x4075,
+
+  CHIBI = 0xa211,
+  PHELPS = 0xbc59,
+  PHELPS_II = 0xbc60,
+}
+
 export enum ButtonAction {
   ALEXA = 1,
   ANC = 2,
