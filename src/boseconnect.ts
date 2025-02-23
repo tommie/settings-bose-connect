@@ -47,52 +47,79 @@ export enum ProductId {
   PHELPS_II = 0xbc60,
 }
 
+export enum ProductType {
+  HEADPHONES = 0,
+  SPEAKER = 1,
+}
+
 export enum ButtonAction {
-  ALEXA = 1,
-  ANC = 2,
+  VPA = 1,
+  ANR = 2,
+  BATTERY_LEVEL = 3,
+  PLAY_PAUSE = 4,
 }
 
 export enum PairedDeviceStatusMask {
   CONNECTED = 1 << 0,
-  REQUESTER = 1 << 1,
+  LOCAL_DEVICE = 1 << 1,
+  BOSE_PRODUCT = 1 << 2,
 }
 
 export enum NoiseReduction {
   OFF = 0,
   HIGH = 1,
+  WIND = 2,
   LOW = 3,
 }
 
 export enum Language {
   EN_UK = 0x00,
   EN_US = 0x01,
-	FR = 0x02,
-	IT = 0x03,
-	DE = 0x04,
+  FR = 0x02,
+  IT = 0x03,
+  DE = 0x04,
   ES_ES = 0x05,
-	ES_MX = 0x06,
-	PT_BR = 0x07,
-	ZH_MA = 0x08, // Mandarin
-	KO = 0x09,
+  ES_MX = 0x06,
+  PT_BR = 0x07,
+  ZH_MA = 0x08, // Mandarin
+  KO = 0x09,
   RU = 0x0A,
   PL = 0x0B,
   HE = 0x0C,
   TR = 0x0D,
-	NL = 0x0E,
-	JA = 0x0F,
+  NL = 0x0E,
+  JA = 0x0F,
   ZH_CA = 0x10, // Cantonese
   AR = 0x11,
-	SV = 0x12,
+  SV = 0x12,
   DA = 0x13,
   NO = 0x14,
   FI = 0x15,
 }
 
-export enum Sidetone {
+export enum SidetoneMode {
   OFF = 0,
   HIGH = 1,
-  MID = 2,
+  MEDIUM = 2,
   LOW = 3,
+}
+
+export enum AudioControlValue {
+  STOP = 0,
+  PLAY = 1,
+  PAUSE = 2,
+  TRACK_FORWARD = 3,
+  TRACK_BACK = 4,
+  FAST_FORWARD_PRESS = 5,
+  FAST_FORWARD_RELEASE = 6,
+  REWIND_PRESS = 7,
+  REWIND_RELEASE = 8,
+}
+
+export enum AudioSourceType {
+  NONE = 0,
+  BLUETOOTH = 1,
+  AUXILIARY = 2,
 }
 
 export enum PlaybackStatus {
@@ -101,13 +128,31 @@ export enum PlaybackStatus {
 }
 
 export enum PlaybackTitleKind {
-  TRACK = 0,
+  SONG_TITLE = 0,
   ARTIST = 1,
   ALBUM = 2,
   TRACK_NUMBER = 3,
-  NUM_TRACKS = 4,
+  TOTAL_NUMBER_OF_TRACKS = 4,
   GENRE = 5,
-  POSITION = 6,
+  PLAYING_TIME = 6,
+}
+
+export enum VoicePersonalAssistant {
+  GOOGLE_ASSISTANT = 0,
+  ALEXA = 1,
+  NONE = 0x7F,
+}
+
+export enum VoicePersonalAssistantTrigger {
+  VPA_NOT_TRIGGERED = 0,
+  BUTTON_PRESS = 1,
+  WAKE_UP_WORD = 2,
+  VPA_NOTIFICATION = 3,
+}
+
+export enum WakeUpWord {
+  OK_GOOGLE = 0,
+  ALEXA = 1,
 }
 
 export type CustomEventListenerOrEventListenerObject<E extends Event> = {
@@ -134,7 +179,7 @@ export enum Function {
   PRODUCT_ID_VARIANT = 0x0003,
   PRODUCT_INFO_GET_ALL_FUNCTIONS = 0x0004,
   FIRMWARE_VERSION = 0x0005,
-  MAX_ADDRESS = 0x0006,
+  MAC_ADDRESS = 0x0006,
   SERIAL_NUMBER = 0x0007,
   HARDWARE_REVISION = 0x000A,
   COMPONENT_DEVICES = 0x000B,
@@ -186,6 +231,11 @@ export enum Function {
   VOLUME = 0x0505,
   NOW_PLAYING = 0x0506,
 
+  // Block VPA [voice personal assistant]
+  VPA_INFO = 0x1000,
+  VPA_GET_ALL = 0x1001,
+  SUPPORTED_VPAS = 0x1002,
+
   // Block 3 FIRMWARE_UPDATE (INFO, STATE, INIT, DATA_TRANSFER, SYNCHRONIZE, VALIDATE, RUN, RESET)
   // Block 6 CALL_MANAGEMENT
   // Block 7 CONTROL (INFO, GET_ALL, CHIRP)
@@ -194,7 +244,6 @@ export enum Function {
   // Block 12 HEARING_ASSISTANCE
   // Block 13 DATA_COLLECTION
   // Block 14 HEART_RATE
-  // Block 16 VPA [voice personal assistant] (INFO, GET_ALL, SUPPORTED_VPAS)
   // Block 21 AUGMENTED_REALITY
 }
 
@@ -233,6 +282,18 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
 
   public getProductVersion() {
     return this.productVersion
+  }
+
+  public getAllFunctionBlocks() {
+    return this.request(Function.GET_ALL_FUNCTION_BLOCKS, undefined, PacketKind.START)
+  }
+
+  private parseGetAllFunctionBlocks(data: PacketTree["payload"]) {
+    if (!(data instanceof Map)) throw new Error()
+
+    const dec = new TextDecoder()
+
+    return Array.from(data.values()).map(packet => [packet.cmd >> 8, dec.decode(expectStatus(packet).payload)])
   }
 
   public async getProductIdVariant() {
@@ -455,12 +516,15 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
 
   private parsePairedDeviceInfo(data: ArrayBuffer) {
     const view = new Uint8Array(data)
+    const dview = new DataView(data)
+    const status = view[6] as PairedDeviceStatusMask
+    const hasBoseProduct = Boolean(status & PairedDeviceStatusMask.BOSE_PRODUCT)
 
     return {
       address: view.slice(0, 6),
-      status: view[6] as PairedDeviceStatusMask,
-      unknown: view.slice(7, 9),
-      name: new TextDecoder().decode(view.slice(9)),
+      status,
+      boseProduct: !hasBoseProduct ? undefined : { productId: dview.getUint16(7, false), variant: dview.getUint8(9) },
+      name: new TextDecoder().decode(view.slice(hasBoseProduct ? 10 : 9)),
     }
   }
 
@@ -477,7 +541,11 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
   private parseSource(data: ArrayBuffer) {
     const view = new Uint8Array(data)
 
-    return { address: view.slice(3), unknown: view.slice(0, 3) }
+    return {
+      address: view.slice(3),
+      type: view[2] as AudioSourceType,
+      unknown: view.slice(0, 2), // a bit set
+    }
   }
 
   public getAllAudio() {
@@ -542,6 +610,25 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
     await this.request(Function.VOLUME, new Uint8Array(payload.buffer), PacketKind.SET_GET)
   }
 
+  public getAllVpa() {
+    return this.request(Function.VPA_GET_ALL, undefined, PacketKind.START) as Promise<ReturnType<BoseConnectDevice['parseGetAllVpa']>>
+  }
+
+  private parseGetAllVpa(data: PacketTree["payload"]) {
+    if (!(data instanceof Map)) throw new Error()
+
+    const supported = data.get(Function.SUPPORTED_VPAS)
+
+    return {
+      supported: !supported ? undefined : this.parseSupportedVpas(expectStatus(supported).payload),
+    }
+  }
+
+  private parseSupportedVpas(data: ArrayBuffer) {
+    // The top bit has some special meaning.
+    return Array.from(new Uint8Array(data)).map(v => (v & 0x7F) as VoicePersonalAssistant)
+  }
+
   private async request<C extends Function>(cmd: C, payload?: Parameters<BoseConnectLowLevel['writePacket']>[2], kind = PacketKind.GET) {
     await this.productVersion
 
@@ -556,6 +643,8 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
     switch (p.cmd) {
       case Function.PRODUCT_VERSION:
         return this.parseProductVersion(expectStatus(p).payload)
+      case Function.GET_ALL_FUNCTION_BLOCKS:
+        return this.parseGetAllFunctionBlocks(expectProcessingMap(p).payload)
       case Function.PRODUCT_ID_VARIANT:
         return this.parseProductIdVariant(expectStatus(p).payload)
       case Function.FIRMWARE_VERSION:
@@ -598,6 +687,11 @@ export class BoseConnectDevice extends (EventTarget as { new(): CustomEventTarge
         return this.parseVolume(expectStatus(p).payload)
       case Function.NOW_PLAYING:
         return this.parseNowPlaying(expectProcessing(p).payload)
+
+      case Function.VPA_GET_ALL:
+        return this.parseGetAllVpa(expectProcessingMap(p).payload)
+      case Function.SUPPORTED_VPAS:
+        return this.parseSupportedVpas(expectStatus(p).payload)
 
       default:
         return p.payload
