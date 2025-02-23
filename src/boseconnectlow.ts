@@ -179,8 +179,11 @@ export class BoseConnectLowLevel {
       case PacketKind.STATUS:
         return packet
 
-      case PacketKind.ERROR:
-        throw new PacketError(`Error received for 0x${packet.cmd.toString(0x10)}: ${toHexString(new Uint8Array(packet.payload))}`)
+      case PacketKind.ERROR: {
+        const payload = new Uint8Array(packet.payload)
+        const name = payload.length === 1 ? ErrorCode[payload[0]] : undefined
+        throw new PacketError(`Error received for 0x${packet.cmd.toString(0x10)}: ${name ?? toHexString(payload)}`)
+      }
 
       case PacketKind.PROCESSING:
         break
