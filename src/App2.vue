@@ -54,7 +54,7 @@ async function doWriting(fun: () => Promise<void> | void) {
 }
 
 async function onUpdateDeviceName(value: string) {
-  await doWriting(() => device.dev?.setDeviceName(value))
+  await doWriting(() => device.dev?.setProductName(value))
 }
 
 async function onUpdateVolume(value: number) {
@@ -65,30 +65,30 @@ async function onUpdateVoicePrompts(value: boolean) {
   if (!device.deviceSettings?.language) return
   const lang = device.deviceSettings?.language
 
-  await doWriting(() => device.dev?.setLanguage(lang.language, value))
+  await doWriting(() => device.dev?.setVoicePrompts(lang.language, value))
 }
 
 async function onUpdateLanguage(value: Language) {
   if (!device.deviceSettings?.language) return
   const lang = device.deviceSettings?.language
 
-  await doWriting(() => device.dev?.setLanguage(value, lang.prompt))
+  await doWriting(() => device.dev?.setVoicePrompts(value, lang.prompt))
 }
 
 async function onUpdateAutoOffTimer(value: number) {
-  await doWriting(() => device.dev?.setAutoOff(value))
+  await doWriting(() => device.dev?.setStandbyTimer(value))
 }
 
-async function onUpdateNoiseLevel(value: NoiseCancellation) {
-  await doWriting(() => device.dev?.setNoiseCancellation(value))
+async function onUpdateNoiseReduction(value: NoiseCancellation) {
+  await doWriting(() => device.dev?.setNoiseReduction(value))
 }
 
-async function onPairDevice() {
-  await doWriting(() => device.dev?.setPairing(true))
+async function onPairing() {
+  await doWriting(() => device.dev?.setPairingMode(true))
 }
 
-async function onUnpairDevice(addr: Uint8Array) {
-  await doWriting(() => device.dev?.unpairDevice(addr))
+async function onDisconnectDevice(addr: Uint8Array) {
+  await doWriting(() => device.dev?.disconnectDevice(addr))
 }
 
 async function onRemoveDevice(addr: Uint8Array) {
@@ -119,12 +119,12 @@ function getSource() {
       v-if="device.audioStatus?.volume?.current !== undefined && device.audioStatus?.volume?.max !== undefined" />
     <DeviceSettings :voicePrompts="device.deviceSettings.language.prompt"
       :language="device.deviceSettings.language.language" :autoOffTimer="device.deviceSettings.autoOff"
-      :noiseLevel="device.deviceSettings.anc" @update:voicePrompts="onUpdateVoicePrompts"
+      :noiseReduction="device.deviceSettings.anc" @update:voicePrompts="onUpdateVoicePrompts"
       @update:language="onUpdateLanguage" @update:autoOffTimer="onUpdateAutoOffTimer"
-      @update:noiseLevel="onUpdateNoiseLevel"
+      @update:noiseReduction="onUpdateNoiseReduction"
       v-if="device.deviceSettings?.language && device.deviceSettings?.autoOff !== undefined && device.deviceSettings.anc !== undefined" />
-    <PairedDevices :devices="device.pairedDevices" @pairdevice="onPairDevice" @unpairdevice="onUnpairDevice"
-      @removedevice="onRemoveDevice" v-if="device.pairedDevices" />
+    <PairedDevices :devices="device.pairedDevices" @pairing="onPairing" @disconnect="onDisconnectDevice"
+      @remove="onRemoveDevice" v-if="device.pairedDevices" />
     <DeviceInfo :serialNumber="device.serialNumber" :deviceId="device.productId.productId"
       :deviceVersion="device.productVersion" :firmwareVersion="device.firmwareVersion"
       v-if="device.serialNumber && device.productId && device.productVersion && device.firmwareVersion" />

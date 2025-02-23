@@ -6,21 +6,21 @@ defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'pairdevice'): void;
-  (e: 'unpairdevice', address: Uint8Array): void;
-  (e: 'removedevice', address: Uint8Array): void;
+  (e: 'pairing'): void;
+  (e: 'disconnect', address: Uint8Array): void;
+  (e: 'remove', address: Uint8Array): void;
 }>()
 
-function onClickUnpair(address: Uint8Array) {
-  emit('unpairdevice', address)
+function onClickDisconnect(address: Uint8Array) {
+  emit('disconnect', address)
 }
 
 function onClickRemove(address: Uint8Array) {
-  emit('removedevice', address)
+  emit('remove', address)
 }
 
 function onClickPair() {
-  emit('pairdevice')
+  emit('pairing')
 }
 </script>
 
@@ -36,17 +36,17 @@ function onClickPair() {
       <div class="d-flex flex-column gap-2">
         <div v-for="device in devices" :key="device.address.toString()"
           class="device-item d-flex align-items-center justify-content-between p-2 rounded">
-          <div :class="['d-flex align-items-center gap-3', { 'current': device.status & PairedDeviceStatusMask.REQUESTER }]">
+          <div :class="['d-flex align-items-center gap-3', { 'current': device.status & PairedDeviceStatusMask.LOCAL_DEVICE }]">
             <i class="bi bi-bluetooth" />
             <div>
               <p class="mb-0">{{ device.name }}</p>
-              <p class="text-secondary small mb-0" v-if="device.status & PairedDeviceStatusMask.REQUESTER">This device</p>
+              <p class="text-secondary small mb-0" v-if="device.status & PairedDeviceStatusMask.LOCAL_DEVICE">This device</p>
               <p class="text-secondary small mb-0" v-else-if="device.status & PairedDeviceStatusMask.CONNECTED">Connected</p>
               <p class="text-secondary small mb-0" v-else>Disconnected</p>
             </div>
           </div>
           <div class="device-actions">
-            <button class="btn text-white" @click="onClickUnpair(device.address)">
+            <button class="btn text-white" @click="onClickDisconnect(device.address)">
               <i class="bi bi-x-lg" />
             </button>
             <button class="btn text-danger" @click="onClickRemove(device.address)">

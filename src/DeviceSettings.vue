@@ -7,14 +7,14 @@ const props = defineProps<{
   voicePrompts: boolean;
   language: Language;
   autoOffTimer: number; // In minutes.
-  noiseLevel: NoiseReduction;
+  noiseReduction: NoiseReduction;
 }>()
 
 const emit = defineEmits<{
   (e: 'update:voicePrompts', value: boolean): void;
   (e: 'update:language', value: Language): void;
   (e: 'update:autoOffTimer', value: number): void;
-  (e: 'update:noiseLevel', value: NoiseReduction): void;
+  (e: 'update:noiseReduction', value: NoiseReduction): void;
 }>()
 
 function onChangeVoicePrompts(e: Event) {
@@ -29,8 +29,8 @@ function onChangeAutoOffTimer(e: Event) {
   emit('update:autoOffTimer', parseInt((e.target as HTMLSelectElement).value))
 }
 
-function onChangeNoiseCancellation(e: Event) {
-  emit('update:noiseLevel', NoiseReduction[(e.target as HTMLSelectElement).value] ?? props.noiseLevel)
+function onChangeNoiseReduction(e: Event) {
+  emit('update:noiseReduction', NoiseReduction[(e.target as HTMLSelectElement).value] ?? props.noiseReduction)
 }
 </script>
 
@@ -102,9 +102,10 @@ function onChangeNoiseCancellation(e: Event) {
             <span>Noise Reduction</span>
           </div>
           <select class="form-select form-select-sm bg-dark text-white border-secondary" style="width: 100px"
-            :value="NoiseReduction[noiseLevel]" @change="onChangeNoiseCancellation">
+            :value="NoiseReduction[noiseReduction]" @change="onChangeNoiseReduction">
             <option :value="NoiseReduction[NoiseReduction.OFF]">Off</option>
             <option :value="NoiseReduction[NoiseReduction.LOW]">Low</option>
+            <!-- TODO: not supported by 0x4020 <option :value="NoiseReduction[NoiseReduction.WIND]">Wind</option>-->
             <option :value="NoiseReduction[NoiseReduction.HIGH]">High</option>
           </select>
         </div>

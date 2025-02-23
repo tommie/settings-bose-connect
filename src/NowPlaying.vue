@@ -18,7 +18,7 @@ function takeKind(kind: PlaybackTitleKind) {
       <i class="bi bi-play-circle-fill text-primary fs-4 me-3" v-if="status === PlaybackStatus.PLAYING" />
       <i class="bi bi-stop-circle text-secondary fs-4 me-3" v-else />
       <div class="flex-grow-1 text-center">
-        <div class="mb-1" v-if="data.length">{{ takeKind(PlaybackTitleKind.TRACK) }}</div>
+        <div class="mb-1" v-if="data.length">{{ takeKind(PlaybackTitleKind.SONG_TITLE) }}</div>
         <div class="text-secondary small" v-if="data.length">{{ takeKind(PlaybackTitleKind.ARTIST) }} • {{ takeKind(PlaybackTitleKind.ALBUM)
         }}</div>
         <div class="text-secondary small" v-if="source">From: {{ source }}</div>
