@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { Toast } from 'bootstrap'
 import { onMounted, shallowRef, watch } from 'vue'

@@ -168,6 +168,7 @@ export interface CustomEventTarget<EventMap extends Record<string, Event>> exten
 }
 
 export type BoseConnectEvents = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   receive: CustomEvent<{ id: Function, payload: any }>;
 }
 
