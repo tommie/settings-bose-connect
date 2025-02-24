@@ -121,6 +121,7 @@ function getSource() {
     />
     <PairedDevices
       :devices="device.pairedDevices"
+      :maxNumDevices="device.maxNumPairedDevices"
       @pairing="onPairing"
       @disconnect="onDisconnectDevice"
       @remove="onRemoveDevice"

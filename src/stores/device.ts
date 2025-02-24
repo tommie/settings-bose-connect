@@ -16,6 +16,7 @@ export const useDeviceStore = defineStore('device', () => {
   const deviceSettings = ref<Awaited<ReturnType<BoseConnectDevice['getAllSettings']>>>()
   const serialNumber = shallowRef<string>()
   const batteryLevel = shallowRef<number>()
+  const maxNumPairedDevices = ref<number>()
   const pairedDevices =
     shallowRef<Awaited<ReturnType<BoseConnectDevice['getPairedDeviceInfo']>>[]>()
   const activeDevice = shallowRef<Awaited<ReturnType<BoseConnectDevice['getSource']>>>()
@@ -90,9 +91,11 @@ export const useDeviceStore = defineStore('device', () => {
       batteryLevel.value = await dev.getBatteryLevel()
 
       const newPairedDevices: Awaited<ReturnType<BoseConnectDevice['getPairedDeviceInfo']>>[] = []
-      for (const address of await dev.getPairedDeviceList()) {
+      const { addresses, numSlots } = await dev.getPairedDeviceList()
+      for (const address of addresses) {
         newPairedDevices.push(await dev.getPairedDeviceInfo(address))
       }
+      maxNumPairedDevices.value = numSlots
       pairedDevices.value = newPairedDevices
       activeDevice.value = await dev.getSource()
       audioStatus.value = await dev.getAllAudio()
@@ -184,6 +187,7 @@ export const useDeviceStore = defineStore('device', () => {
 
     deviceSettings,
     batteryLevel,
+    maxNumPairedDevices,
     pairedDevices,
     activeDevice,
     audioStatus,

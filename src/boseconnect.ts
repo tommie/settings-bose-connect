@@ -509,13 +509,16 @@ export class BoseConnectDevice extends (EventTarget as {
 
   private parsePairedDeviceList(data: ArrayBuffer) {
     const view = new Uint8Array(data)
-    const devices: Uint8Array[] = []
+    const addresses: Uint8Array[] = []
 
-    for (let i = 0, off = 1; i < view[0]; ++i, off += 6) {
-      devices.push(view.slice(off, off + 6))
+    for (let off = 1; off < view.byteLength; off += 6) {
+      addresses.push(view.slice(off, off + 6))
     }
 
-    return devices
+    return {
+      numSlots: view[0],
+      addresses,
+    }
   }
 
   public async getPairedDeviceInfo(addr: Uint8Array | Parameters<(typeof Uint8Array)['from']>) {

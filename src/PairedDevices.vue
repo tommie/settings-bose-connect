@@ -3,6 +3,7 @@ import { PairedDeviceStatusMask } from './boseconnect'
 
 defineProps<{
   devices: { address: Uint8Array; name: string; status: PairedDeviceStatusMask }[]
+  maxNumDevices?: number
 }>()
 
 const emit = defineEmits<{
@@ -74,6 +75,12 @@ function onClickPair() {
               <i class="bi bi-trash" />
             </button>
           </div>
+        </div>
+        <div
+          class="text-center small text-secondary"
+          v-if="maxNumDevices && devices.length === maxNumDevices"
+        >
+          All slots used
         </div>
       </div>
     </div>
