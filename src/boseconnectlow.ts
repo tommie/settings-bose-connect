@@ -226,7 +226,6 @@ export class BoseConnectLowLevel {
         if (!tree) tree = { ...packet, payload: new Map() }
         const pktTree = await this.readPacketTreeRec(pkt, r)
         if (!pktTree) return null
-
         ;(tree.payload as Map<number, PacketTree>).set(pkt.cmd, pktTree)
       }
     }
